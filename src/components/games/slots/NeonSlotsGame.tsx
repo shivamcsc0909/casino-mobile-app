@@ -23,6 +23,7 @@ export const NeonSlotsGame: React.FC = () => {
   ]);
 
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const [reelSpinning, setReelSpinning] = useState<[boolean, boolean, boolean]>([false, false, false]);
   const [turboMode, setTurboMode] = useState<boolean>(false);
   const [autoSpinCount, setAutoSpinCount] = useState<number>(0);
   const [winningLineIds, setWinningLineIds] = useState<number[]>([]);
@@ -51,39 +52,52 @@ export const NeonSlotsGame: React.FC = () => {
 
     addVipPoints(Math.floor(totalBet / 5));
     setIsSpinning(true);
+    setReelSpinning([true, true, true]);
     setWinningLineIds([]);
     setLastWin(null);
 
     soundManager.playReelTick();
 
-    const duration = turboMode ? 400 : 1300;
+    // Prepare outcome symbols in advance
+    const outcomeGrid: SlotSymbol[][] = [
+      [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()],
+      [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()],
+      [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()],
+    ];
 
-    // Simulate reel rotation ticks
-    const tickInterval = setInterval(() => {
-      soundManager.playReelTick();
-    }, turboMode ? 80 : 140);
+    const d1 = turboMode ? 250 : 700;
+    const d2 = turboMode ? 400 : 1100;
+    const d3 = turboMode ? 550 : 1500;
 
+    // Staggered Reel 0 stop
     setTimeout(() => {
-      clearInterval(tickInterval);
+      setGrid((prev) => [outcomeGrid[0], prev[1], prev[2]]);
+      setReelSpinning([false, true, true]);
+      soundManager.playReelTick();
+    }, d1);
 
-      // Generate random final grid: 3 columns of 3 symbols
-      const newGrid: SlotSymbol[][] = [
-        [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()],
-        [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()],
-        [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()],
-      ];
+    // Staggered Reel 1 stop
+    setTimeout(() => {
+      setGrid((prev) => [prev[0], outcomeGrid[1], prev[2]]);
+      setReelSpinning([false, false, true]);
+      soundManager.playReelTick();
+    }, d2);
 
-      setGrid(newGrid);
+    // Staggered Reel 2 stop and final evaluation
+    setTimeout(() => {
+      setGrid(outcomeGrid);
+      setReelSpinning([false, false, false]);
       setIsSpinning(false);
+      soundManager.playReelTick();
 
       // Evaluate 5 paylines
       let totalPayout = 0;
       const hitLines: number[] = [];
 
       PAYLINES.forEach((line) => {
-        const s1 = newGrid[0][line.indices[0]];
-        const s2 = newGrid[1][line.indices[1]];
-        const s3 = newGrid[2][line.indices[2]];
+        const s1 = outcomeGrid[0][line.indices[0]];
+        const s2 = outcomeGrid[1][line.indices[1]];
+        const s3 = outcomeGrid[2][line.indices[2]];
 
         // Match 3 or with Wilds
         const isMatch =
@@ -92,7 +106,6 @@ export const NeonSlotsGame: React.FC = () => {
           (s1.id === s3.id || s1.isWild || s3.isWild);
 
         if (isMatch) {
-          // Determine winning symbol
           const mainSymbol = !s1.isWild ? s1 : !s2.isWild ? s2 : s3;
           const payout = betPerLine * mainSymbol.multiplier;
           totalPayout += payout;
@@ -106,7 +119,6 @@ export const NeonSlotsGame: React.FC = () => {
         addWin(totalPayout, 'Neon Slots 777');
         setLastWin(totalPayout);
 
-        // Check if Mega Win (20x or higher)
         if (totalPayout >= totalBet * 15) {
           setCelebrationAmount(totalPayout);
           setShowCelebration(true);
@@ -122,7 +134,7 @@ export const NeonSlotsGame: React.FC = () => {
       if (autoSpinRef.current > 0) {
         setAutoSpinCount((prev) => prev - 1);
       }
-    }, duration);
+    }, d3);
   };
 
   // Auto spin trigger
@@ -212,8 +224,8 @@ export const NeonSlotsGame: React.FC = () => {
           {[0, 1, 2].map((colIdx) => (
             <div
               key={colIdx}
-              className={`flex flex-col gap-2 rounded-xl bg-slate-900/80 p-2 border border-slate-800 transition-all ${
-                isSpinning ? 'blur-[1px] opacity-80' : ''
+              className={`flex flex-col gap-2 rounded-xl bg-slate-900/80 p-2 border border-slate-800 transition-all duration-300 ${
+                reelSpinning[colIdx] ? 'blur-[2.5px] opacity-75 translate-y-1' : 'blur-0 opacity-100 translate-y-0'
               }`}
             >
               {[0, 1, 2].map((rowIdx) => {

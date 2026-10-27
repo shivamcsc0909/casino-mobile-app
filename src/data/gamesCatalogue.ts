@@ -11,6 +11,7 @@ export interface CasinoGameInfo {
   minBet: number;
   maxMultiplier: string;
   description: string;
+  rtp?: string;
 }
 
 export const CASINO_ZONES = [

@@ -100,7 +100,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onInitiateLogin }) => 
           <div className="w-full">
             {/* Phone Login Form */}
             {!showOtpInput ? (
-              <form onSubmit={handleSendOtp} className="space-y-3 mb-3">
+              <form onSubmit={handleSendOtp} className="space-y-2.5 mb-3">
+                <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                  <span>Mobile Credentials</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundManager.playButtonTap();
+                      setPhone('9876543210');
+                    }}
+                    className="text-casino-gold hover:underline font-mono text-[10px] font-bold"
+                  >
+                    ⚡ Autofill Demo Number
+                  </button>
+                </div>
                 <div className="flex rounded-2xl bg-[#090C12] border border-slate-700/80 overflow-hidden focus-within:border-casino-gold transition-colors">
                   <span className="px-3 py-2.5 bg-slate-800/60 text-slate-300 text-xs font-black border-r border-slate-700 flex items-center">
                     +91

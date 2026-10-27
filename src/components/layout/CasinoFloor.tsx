@@ -91,33 +91,44 @@ export const CasinoFloor: React.FC<CasinoFloorProps> = ({
                 <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded-full border ${game.tagColor}`}>
                   {game.tag}
                 </span>
-                <span className="text-[10px] text-slate-500 font-mono-numbers">
-                  {game.players}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] text-slate-400 font-mono-numbers">
+                    {game.players}
+                  </span>
+                </div>
               </div>
 
               {/* Large Visual Pictogram & Title */}
               <div className="flex items-center gap-3 my-2">
-                <div className="w-12 h-12 rounded-2xl bg-black/40 border border-slate-700/60 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shrink-0 shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-black/50 border border-slate-700/60 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shrink-0 shadow-inner">
                   {game.pictogram}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-black text-white font-display truncate group-hover:text-casino-gold transition-colors">
                     {game.title}
                   </h3>
-                  <span className="text-[10px] text-slate-400 block truncate">
-                    {game.zone}
-                  </span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[10px] text-slate-400 truncate">
+                      {game.zone}
+                    </span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold border border-emerald-500/20">
+                      RTP 98.6%
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom: Multiplier & How To Play button */}
             <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-800/80">
-              <span className="font-mono-numbers font-black text-emerald-400 text-xs">
-                {game.maxMultiplier}
-              </span>
-              <div className="flex items-center gap-1 text-[11px] font-bold text-casino-gold">
+              <div className="flex items-center gap-1">
+                <span className="text-[9px] uppercase font-bold text-slate-500">MAX</span>
+                <span className="font-mono-numbers font-black text-emerald-400 text-xs">
+                  {game.maxMultiplier}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] font-bold text-casino-gold group-hover:underline">
                 <HelpCircle className="w-3.5 h-3.5" />
                 <span>Rules / Play</span>
               </div>

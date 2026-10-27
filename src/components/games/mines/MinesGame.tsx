@@ -148,6 +148,43 @@ export const MinesGame: React.FC = () => {
                 </button>
               ))}
             </div>
+
+            {/* Quick Multipliers: 1/2, 2X, MAX (inspired by web3 casino) */}
+            <div className="flex gap-1 mb-2">
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.playChipSound();
+                  setBetAmount((b) => Math.max(20, Math.floor(b / 2)));
+                }}
+                disabled={isPlaying}
+                className="flex-1 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] font-bold text-slate-300"
+              >
+                1/2
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.playChipSound();
+                  setBetAmount((b) => Math.min(getActiveBalance(), b * 2));
+                }}
+                disabled={isPlaying}
+                className="flex-1 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] font-bold text-slate-300"
+              >
+                2X
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.playChipSound();
+                  setBetAmount(Math.min(5000, getActiveBalance()));
+                }}
+                disabled={isPlaying}
+                className="flex-1 py-1 rounded-lg bg-casino-gold/15 hover:bg-casino-gold/25 border border-casino-gold/30 text-[10px] font-black text-casino-gold"
+              >
+                MAX
+              </button>
+            </div>
           </div>
 
           {/* Mines Count Selector */}
@@ -220,7 +257,15 @@ export const MinesGame: React.FC = () => {
                     : 'bg-[#151C2C] hover:bg-[#1E273D] border border-slate-700/60 shadow-md'
                 }`}
               >
-                {tile.revealed ? (tile.isMine ? '💣' : '💎') : ''}
+                {tile.revealed ? (
+                  tile.isMine ? (
+                    <span className="animate-bounce-subtle text-red-400 drop-shadow-[0_0_12px_rgba(239,68,68,0.9)]">💣</span>
+                  ) : (
+                    <span className="animate-scale-in text-emerald-300 drop-shadow-[0_0_15px_rgba(16,185,129,0.9)] scale-110">💎</span>
+                  )
+                ) : (
+                  <span className="w-2 h-2 rounded-full bg-slate-700/50" />
+                )}
               </button>
             ))}
           </div>

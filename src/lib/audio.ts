@@ -7,6 +7,44 @@ class SoundEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
   private volume: number = 0.6;
+  private audioCache: Map<string, HTMLAudioElement> = new Map();
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const soundFiles = [
+        ['win', '/sounds/win.mp3'],
+        ['lose', '/sounds/lose.mp3'],
+        ['place', '/sounds/chip_place.mp3'],
+        ['pickup', '/sounds/chip_pickup.mp3'],
+        ['tick', '/sounds/tick.mp3'],
+      ];
+      soundFiles.forEach(([key, src]) => {
+        try {
+          const audio = new Audio(src);
+          audio.preload = 'auto';
+          this.audioCache.set(key, audio);
+        } catch {
+          // ignore audio preload error
+        }
+      });
+    }
+  }
+
+  private playSoundFile(key: string, volMultiplier: number = 1): boolean {
+    if (this.isMuted) return false;
+    try {
+      const audio = this.audioCache.get(key);
+      if (audio) {
+        audio.currentTime = 0;
+        audio.volume = Math.max(0, Math.min(1, this.volume * volMultiplier));
+        audio.play().catch(() => {});
+        return true;
+      }
+    } catch {
+      // Fallback
+    }
+    return false;
+  }
 
   private getContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
@@ -65,6 +103,8 @@ class SoundEngine {
   // Realistic clay chip clinking sound
   public playChipSound() {
     if (this.isMuted) return;
+    this.playSoundFile(Math.random() > 0.5 ? 'place' : 'pickup', 0.85);
+
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -144,6 +184,7 @@ class SoundEngine {
   // Roulette fret tick
   public playWheelTick() {
     if (this.isMuted) return;
+    this.playSoundFile('tick', 0.5);
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -172,6 +213,7 @@ class SoundEngine {
   // Slot reel tick
   public playReelTick() {
     if (this.isMuted) return;
+    this.playSoundFile('tick', 0.6);
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -200,6 +242,7 @@ class SoundEngine {
   // Cash out bell sound
   public playCashOut() {
     if (this.isMuted) return;
+    this.playSoundFile('win', 0.7);
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -231,6 +274,7 @@ class SoundEngine {
   // Win Chime (Celebratory Chords)
   public playWinChime() {
     if (this.isMuted) return;
+    this.playSoundFile('win', 0.9);
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -263,6 +307,7 @@ class SoundEngine {
   // Crash rocket explosion / bust
   public playCrashSound() {
     if (this.isMuted) return;
+    this.playSoundFile('lose', 0.8);
     const ctx = this.getContext();
     if (!ctx) return;
 
